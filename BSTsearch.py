@@ -55,10 +55,12 @@ class BinaryTree:
 			if temp != None:
 				curr.setRight(temp)
 
-	def insert(self, node):
-		temp = self._insert(self.root, node)
-		if temp != None:
-				self.root = temp
+	def insert(self, dic):
+		for i in dic:
+			node = Node(dic[i], i)
+			temp = self._insert(self.root, node)
+			if temp != None:
+					self.root = temp
 
 	def _find(self, curr, big, small, node):
 		if curr == None:
@@ -77,7 +79,11 @@ class BinaryTree:
 		return self._find(self.root, None, None, node)
 
 a = BinaryTree()
-a.insert(Node(10.5, 10))
+b = {(1, 2):144.87, (1, 3):144.89, (1, 4):143.6799, (1, 5):143.91666666666629, (2, 3):143.93000000000001, (2, 4):143.27999999999986, (2, 5):143.58333333333329, (3, 4):141.20999999999998, (3, 5):143.15000000000006, (4, 5):145.09999999999999}
+a.insert(b)
+print(a.size())
+print(len(b))
+"""a.insert(Node(10.5, 10))
 a.insert(Node(10.5, 10))
 a.insert(Node(11.1, 10))
 a.insert(Node(10.1, 10))
@@ -94,4 +100,4 @@ print(b.getData())
 b = a.find(Node(10.8, 0))
 print(b.getData())
 b = a.find(Node(11, 0))
-print(b.getData())
+print(b.getData())"""
