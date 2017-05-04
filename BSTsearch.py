@@ -62,6 +62,7 @@ class BinaryTree:
 			if temp != None:
 					self.root = temp
 
+
 	def _find(self, curr, big, small, node):
 		if curr == None:
 			if node.getData() - small.getData() < big.getData() - node.getData():
@@ -84,6 +85,7 @@ a.insert(b)
 print(a.size())
 print(len(b))
 """a.insert(Node(10.5, 10))
+
 a.insert(Node(10.5, 10))
 a.insert(Node(11.1, 10))
 a.insert(Node(10.1, 10))
@@ -101,3 +103,4 @@ b = a.find(Node(10.8, 0))
 print(b.getData())
 b = a.find(Node(11, 0))
 print(b.getData())"""
+
