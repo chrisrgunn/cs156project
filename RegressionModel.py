@@ -4,6 +4,8 @@ from sklearn.svm import SVR
 import matplotlib.pyplot as plt
 import copy
 from collections import OrderedDict
+import sys
+import datetime
 
 '''
 Predicts a single value with Regression based on:
@@ -53,12 +55,25 @@ def predictAllPrices(dateValues, dayToPredict, modelType):
 	currMin = 0
 	currMax = 0
 	dateValueDict = OrderedDict({})
+	startTime = datetime.datetime.now()
 	for i in range(0, sizeOfDateValues):
+		percentComplete = 100*float((i+1)) / float(sizeOfDateValues)
+		if (i % 10 == 0):
+			currTime = datetime.datetime.now()
+			elapsedDateTime = (currTime - startTime)
+			# elapsedTime = divmod(elapsedDateTime.days * 86400 + elapsedDateTime.seconds, 60)
+			elapsedTime = divmod(elapsedDateTime.total_seconds(), 60)
+			currMinutesRemaining = (float(elapsedTime[0]) * float(sizeOfDateValues) / float(i+1)) - float(elapsedTime[0])
+			totalSecondsRemaining = (float(elapsedTime[1]) * float(sizeOfDateValues) / float(i+1)) - float(elapsedTime[1]) + currMinutesRemaining*60.00
+			totalMinSecRemaining = divmod(totalSecondsRemaining, 60)
+		sys.stderr.write('\rComputing subset %d of %d (%.2f%%) %d min %d secs remaining ' % (i+1, sizeOfDateValues, percentComplete, totalMinSecRemaining[0], totalMinSecRemaining[1]))
+		sys.stderr.flush()
 		currMin = min(dateValues[i].keys())
 		currMax = max(dateValues[i].keys())
 		currPrice = predictPrice(dateValues[i], dayToPredict, modelType)
 		currDataset = (currMin, currMax)
 		dateValueDict[currDataset] = currPrice
+	print("")
 	return dateValueDict
 
 

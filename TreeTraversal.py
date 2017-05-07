@@ -1,4 +1,5 @@
 import sys
+import pickle
 from Queue import *
 
 class Node(object):
@@ -102,16 +103,20 @@ def breadthFirstSearch(rootNode, value):
     currParentNodes = Queue()
     currParentNodes.put(rootNode)
     lengthCurrParentNodes = currParentNodes.qsize()
+    lengthTree = countOfAllTreeNodes(rootNode)
     foundNode = rootNode
     difference = abs(value - rootNode.value)
     count = 0
+    foundNodeCount = 0
 
     while currParentNodes.qsize() > 0:
+        percentComplete = 100*float((count+1)) / float(lengthTree)
         currNode = currParentNodes.get()
         currDifference = abs(value - currNode.value)
         if currDifference < difference:
             difference = currDifference
             foundNode = currNode
+            foundNodeCount = count
         if difference == 0:
             break
         lengthOfChildren = len(currNode.children)
@@ -119,12 +124,20 @@ def breadthFirstSearch(rootNode, value):
             for childIndex in range(0,lengthOfChildren):
                 currParentNodes.put(currNode.children[childIndex])
         count +=1
-    print("Searched through %d nodes" % count)
+
+    print("Optimal node #%d found searching through %d nodes" % (foundNodeCount, count))
     return foundNode
 
-# def writeTreeToFile(rootNode, filename):
-  
-# def getTreeFromFile(filename):
+def writeTreeToFile(rootNode, filename):
+    with open(filename, 'wb') as output:
+        pickle.dump(rootNode, output, pickle.HIGHEST_PROTOCOL)
+
+def readTreeFromFile(filename):
+    with open(filename, 'rb') as input:
+        rootNode = pickle.load(input)
+    return rootNode
+
+
 # if __name__ == "__main__":
 #     test_breadth_first_nodes()
 #     println("")
