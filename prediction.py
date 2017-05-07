@@ -28,10 +28,61 @@ def getData(filename, numRows):
 			i+=1
 		return
 
+'''
+Method to predict a single value with Regression based on:
+dateValues - a dictionary that contains date:price pairs
+dayToPredict - the day to predict where 0 is today, 1 is tomorrow and -1 is yesterday
+modelType - type of Regression model (i.e. "rbf" or "linear")
+'''
+def predictPrice(dateValues, dayToPredict, modelType):
+	if modelType == 'linear':
+		print('Predicting price based on linear model')
+		dates = np.reshape(dateValues.keys(), (len(dateValues), 1)) # format our dates list into an n by 1 matrix
+		values = dateValues.values()
+		# print(values)
+		# print(dates)
+		svrLin = SVR(kernel = 'linear', C=1e3) # linear support vector regression
+		svrLin.fit(dates, values) # fit/train each of our models on our dates/price data using this method
+
+		# The following code is used for graphing purposes
+		'''
+		plt.scatter(dates, values, color='black', label='Data') # plot initial data points as black dots with label 'Data'
+		plt.plot(dates, svrLin.predict(dates), color='green', label='Linear model')
+		plt.scatter(dayToPredict, svrLin.predict(dayToPredict)[0], color = 'green', label='Linear predicted price')		
+		plt.xlabel('Days from today')
+		plt.ylabel('Price')
+		plt.title('Support Vector Regression (Linear)')
+		# plt.legend(loc = 'best')
+		plt.legend(loc = 'upper left')
+		plt.show()
+		'''
+		return svrLin.predict(dayToPredict)[0]
+
+	elif modelType == 'rbf':
+		print('Predicting price based on rbf model')
+	else:
+		print('An incorrect model type was supplied - only choose linear or rbf')
+	
+
+
+testDateValues = {-1:143.73, -2:142.29, -3:141.22, -4:141.20, -5:141, -6:140.5}
+# testDateValues = {-1:143.73, -2:143.73, -3:143.73, -4:143.73, -5:143.73, -6:143.73}
+
+print(testDateValues)
+predictedVal = predictPrice(testDateValues, 0, 'linear')
+print(predictedVal)
+
+# daysAgo = 10
+# getData('aapl.csv', daysAgo)
+
+# print(dates)
+# print(prices)
+
+
 # builds our predictive model and graphs it
 def predictPrices(dates, prices, x):
 	dates = np.reshape(dates, (len(dates), 1)) # format our dates list into an n by 1 matrix
-
+	print(dates)
 	'''
 	support vector machine is a linear separator - it takes data that is already classified and tries to
 	predict data that is not classified
@@ -66,31 +117,32 @@ def predictPrices(dates, prices, x):
 	plt.plot(dates, svrRbf.predict(dates), color='red', label='RBF model')
 	plt.plot(dates, svrLin.predict(dates), color='green', label='Linear model')
 
-	plt.scatter(x, svrLin.predict(x)[0], color = 'green', label='RBF predicted price')
-	plt.scatter(x, svrRbf.predict(x)[0], color = 'red', label = 'Linear predicted price')
+	plt.scatter(x, svrLin.predict(x)[0], color = 'green', label='Linear predicted price')
+	plt.scatter(x, svrRbf.predict(x)[0], color = 'red', label = 'RBF predicted price')
 	# plt.plot(dates, svrPoly.predict(dates), color='blue', label='Polynomial model')
 	# plt.xlabel('Date (April)')
 	plt.xlabel('Days from today (4/9/17)')
 	plt.ylabel('Price')
 	plt.title('Support Vector Regression')
 	plt.legend(loc = 'best')
+	plt.show()
 
 	# we want to return the predictions from each of our models
 	# return svrRbf.predict(x)[0], svrLin.predict(x)[0], svrPoly.predict(x)[0]
 	return svrLin.predict(x)[0], svrRbf.predict(x)[0]
 
-daysAgo = 100
-getData('aapl.csv', daysAgo)
-day = 1
-predictedPrice = predictPrices(dates, prices, day)
+# daysAgo = 10
+# getData('aapl.csv', daysAgo)
+# day = 1
+# predictedPrice = predictPrices(dates, prices, day)
 
 # print "\nPredicted price on day %d from Linear Regression SVM: %f" % (day, predictedPrice[0])
 # print "Predicted price on day %d from Radial Basis Function SVM: %f\n" % (day, predictedPrice[1])
 
-print "\nPredicted price %d day(s) from today (Linear Regression SVM): %f" % (day, predictedPrice[0])
-print "Predicted price %d day(s) from today (Radial Basis Function SVM): %f\n" % (day, predictedPrice[1])
+# print "\nPredicted price %d day(s) from today (Linear Regression SVM): %f" % (day, predictedPrice[0])
+# print "Predicted price %d day(s) from today (Radial Basis Function SVM): %f\n" % (day, predictedPrice[1])
 
-plt.show() # displays graph on the screen
+# plt.show() # displays graph on the screen
 
 
 
