@@ -126,16 +126,23 @@ def breadthFirstSearch(rootNode, value):
         count +=1
 
     print("Optimal node #%d found searching through %d nodes" % (foundNodeCount, count))
+    print("Optimal node value: %.2f dataset: %s\n" % (foundNode.value, foundNode.dataset))
     return foundNode
 
-def writeTreeToFile(rootNode, filename):
+
+def writeTreeToFile(rootNode, foundNode, todaysDate, filename):
     with open(filename, 'wb') as output:
         pickle.dump(rootNode, output, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(foundNode, output, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(todaysDate, output, pickle.HIGHEST_PROTOCOL)
+
 
 def readTreeFromFile(filename):
     with open(filename, 'rb') as input:
         rootNode = pickle.load(input)
-    return rootNode
+        foundNode = pickle.load(input)
+        dateOfWrite = pickle.load(input)
+    return rootNode, foundNode, dateOfWrite
 
 
 # if __name__ == "__main__":

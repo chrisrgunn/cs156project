@@ -22,13 +22,31 @@ def getDataCsv(filename, startDay, endDay):
             index += 1
         currDay = startDay
         for row in csvFileReader:
-            dateValues[currDay] = float((row[1])) # append the price and convert to float to be more precise
+            dateValues[currDay] = float((row[4])) # append the price and convert to float to be more precise
             if currDay == endDay:
                 break
             currDay += 1
         return dateValues
 
 
+def getDayOffsetCsv(filename, date):
+    date = str(date)
+    with open(filename, 'r') as csvfile:
+        csvFileReader = csv.reader(csvfile) 
+        next(csvFileReader) # skip first row because it's only column names
+        index = 0
+        for row in csvFileReader:
+            if row[0] == date:
+                return index
+            index += 1
+        return 0;
+
+def getTodaysDateCsv(filename):
+    with open(filename, 'r') as csvfile:
+        csvFileReader = csv.reader(csvfile) 
+        next(csvFileReader) # skip first row because it's only column names
+        for row in csvFileReader:
+            return row[0]
 '''
 Computes all contiguous subsets (length > 1) of a map by creating a list of keys from the passed in dict, getting
 all contiguous subsets of that list, and then iterating through each subset to map the keys back to
@@ -72,6 +90,22 @@ def getAllContigSubsetsList(alist):
     return subsets
 
 
+def downloadCsvFile(ticker, startDate, endDate, source):
+    if (source == 'google finance'):
+        q = GoogleQuote(ticker, startDate, endDate)
+        q.write_csv(ticker + '.csv')
+    elif (source == 'yahoo'):
+        print("Yahoo is not set up yet!")
+
+'''
+gets a date:value dict based on dataset
+'''
+def getDateValueCsv(dataset, dateOffset, filename):
+    return getDataCsv(filename, dataset[0] + dateOffset, dataset[1] + dateOffset)
+
+
+
+
 class Quote(object):
    
     DATE_FMT = '%Y-%m-%d'
@@ -79,36 +113,39 @@ class Quote(object):
 
     def __init__(self):
         self.symbol = ''
-        self.date,self.time,self.open_,self.high,self.low,self.close,self.volume = ([] for _ in range(7))
+        self.date,self.open_,self.high,self.low,self.close,self.volume = ([] for _ in range(6))
 
     def append(self,dt,open_,high,low,close,volume):
         self.date.append(dt.date())
-        self.time.append(dt.time())
         self.open_.append(float(open_))
         self.high.append(float(high))
         self.low.append(float(low))
         self.close.append(float(close))
         self.volume.append(int(volume))
-       
+        # self.append('Date', 'Open', 'High', 'Low', 'Close', 'Volume')
+
     def to_csv(self):
-        return ''.join(["{0},{1},{2},{3:.2f},{4:.2f},{5:.2f},{6:.2f},{7}\n".format(self.symbol,
-            self.date[bar].strftime('%Y-%m-%d'),self.time[bar].strftime('%H:%M:%S'),
-            self.open_[bar],self.high[bar],self.low[bar],self.close[bar],self.volume[bar]) 
-            for bar in xrange(len(self.close))])
+        length = len(self.close)        
+        return "Date, Open, High, Low, Close, Volume\n" + ''.join(["{0},{1:.2f},{2:.2f},{3:.2f},{4:.2f},{5}\n".format(
+            self.date[length -1 - bar].strftime('%Y-%m-%d'),
+            self.open_[length -1 - bar],self.high[length -1 - bar],self.low[length -1 - bar],self.close[length -1 - bar],self.volume[length -1 - bar]) 
+            for bar in xrange(length)])
      
     def write_csv(self,filename):
+        print("Saving latest stock data to file in CSV format.\n")
         with open(filename,'w') as f:
             f.write(self.to_csv())
-         
+    '''  
     def read_csv(self,filename):
         self.symbol = ''
-        self.date,self.time,self.open_,self.high,self.low,self.close,self.volume = ([] for _ in range(7))
+        self.date,self.open_,self.high,self.low,self.close,self.volume = ([] for _ in range(7))
         for line in open(filename,'r'):
             symbol,ds,ts,open_,high,low,close,volume = line.rstrip().split(',')
             self.symbol = symbol
             dt = datetime.datetime.strptime(ds+' '+ts,self.DATE_FMT+' '+self.TIME_FMT)
             self.append(dt,open_,high,low,close,volume)
         return True
+    '''
 
     def __repr__(self):
         return self.to_csv()
@@ -156,7 +193,7 @@ class GoogleQuote(Quote):
         self.symbol = symbol.upper()
         start = datetime.date(int(start_date[0:4]),int(start_date[5:7]),int(start_date[8:10]))
         end = datetime.date(int(end_date[0:4]),int(end_date[5:7]),int(end_date[8:10]))
-        print("Getting stock data from Google Finance for %s from %s to %s" % (symbol, start_date, end_date))
+        print("Downloading stock data from Google Finance for %s from %s to %s" % (symbol, start_date, end_date))
         url_string = "http://www.google.com/finance/historical?q={0}".format(self.symbol)
         url_string += "&startdate={0}&enddate={1}&output=csv".format(
               start.strftime('%b %d, %Y'),end.strftime('%b %d, %Y'))
