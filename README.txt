@@ -2,7 +2,7 @@
 			READ ME
 ***************************
 
-To run this application on Windows, you must use Anaconda. If Anaconda is not installed, please go to conda.io/miniconda.html and install the appropriate installer for Python 2.7
+To run this application on Windows, you must use Anaconda, otherwise it is incredibly difficult to install the necessary scipy library without it. If you don't already have Anaconda installed, please go to conda.io/miniconda.html and install the appropriate installer for Python 2.7. You can test to see if Anaconda is already installed by simply typing "conda" (without the quotes) in your terminal.
 
 Then in terminal:
 
